@@ -1,4 +1,4 @@
-class BulkDiscountPricingRule < Rule
+class BulkDiscountPricingRule < PricingRule
   attr_accessor :product
   attr_accessor :bulk_count_threshold
   attr_accessor :bulk_discount
