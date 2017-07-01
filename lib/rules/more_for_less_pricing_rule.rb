@@ -1,4 +1,4 @@
-class MoreForLessPricingRule < PricingRule
+class MoreForLessPricingRule < Rule
   def initialize(code, more_count, less_count)
     @product_code = code
     @more_count = more_count
