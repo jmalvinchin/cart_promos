@@ -8,6 +8,7 @@ require_relative 'services/freebie_resolver.rb'
 require_relative 'services/pricing_resolver.rb'
 require_relative 'rules/rule'
 require_relative 'rules/bulk_discount_pricing_rule'
+require_relative 'rules/more_for_less_pricing_rule'
 require 'pry'
 
 class ShoppingCart

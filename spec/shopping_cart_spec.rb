@@ -12,22 +12,45 @@ describe ShoppingCart do
   let(:line_items) { [line_item_1, line_item_2] }
 
   context "3 for 2 promo" do
-    let(:line_item_1) { LineItem.new(product_small, 3) }
     let(:line_item_2) { LineItem.new(product_large, 1) }
+
+    let(:pricing_rules) { [MoreForLessPricingRule.new("ult_small", 3, 2)] }
 
     before do
       shopping_cart.add(line_item_1)
       shopping_cart.add(line_item_2)
 
-      allow(PricingResolver).to receive(:execute).with(pricing_rules, line_items, nil).and_return(94.7)
       allow(FreebieResolver).to receive(:execute).with(freebie_rules, line_items).and_return(line_items)
     end
 
-    it "applies the correct 3 for 2 pricing" do
-      expect(shopping_cart.total).to eq "$94.70"
-      expect(shopping_cart.items).to eq ["3 x Unlimited 1 GB", "1 x Unlimited 5 GB"]
+    context "exact 3 items" do
+      let(:line_item_1) { LineItem.new(product_small, 3) }
+
+      it "applies the correct 3 for 2 pricing" do
+        expect(shopping_cart.total).to eq "$94.70"
+        expect(shopping_cart.items).to eq ["3 x Unlimited 1 GB", "1 x Unlimited 5 GB"]
+      end
+    end
+
+    context "excess of 1 for the 3 for 2 price" do
+      let(:line_item_1) { LineItem.new(product_small, 4) }
+
+      it "applies the correct 3 for 2 pricing" do
+        expect(shopping_cart.total).to eq "$119.60"
+        expect(shopping_cart.items).to eq ["4 x Unlimited 1 GB", "1 x Unlimited 5 GB"]
+      end
+    end
+
+    context "6 for 4" do
+      let(:line_item_1) { LineItem.new(product_small, 6) }
+
+      it "applies the correct 3 for 2 pricing" do
+        expect(shopping_cart.total).to eq "$144.50"
+        expect(shopping_cart.items).to eq ["6 x Unlimited 1 GB", "1 x Unlimited 5 GB"]
+      end
     end
   end
+
 
   context "bulk discount promo" do
     let(:line_item_1) { LineItem.new(product_small, 2) }
