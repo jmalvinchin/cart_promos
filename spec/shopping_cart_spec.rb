@@ -33,11 +33,12 @@ describe ShoppingCart do
     let(:line_item_1) { LineItem.new(product_small, 2) }
     let(:line_item_2) { LineItem.new(product_large, 4) }
 
+    let(:pricing_rules) { [BulkDiscountPricingRule.new("ult_large", 3, 39.9)] }
+
     before do
       shopping_cart.add(line_item_1)
       shopping_cart.add(line_item_2)
 
-      allow(PricingResolver).to receive(:execute).with(pricing_rules, line_items, nil).and_return(209.4)
       allow(FreebieResolver).to receive(:execute).with(freebie_rules, line_items).and_return(line_items)
     end
 
