@@ -78,17 +78,37 @@ describe ShoppingCart do
 
     let(:expected_line_items) { [line_item_1, line_item_2, line_item_3] }
 
+
     before do
       shopping_cart.add(line_item_1)
       shopping_cart.add(line_item_2)
-
-      allow(PricingResolver).to receive(:execute).with(pricing_rules, line_items, nil).and_return(84.7)
-      allow(FreebieResolver).to receive(:execute).with(freebie_rules, line_items).and_return(expected_line_items)
     end
 
-    it "applies the additional freebies to the items" do
-      expect(shopping_cart.total).to eq "$84.70"
-      expect(shopping_cart.items).to eq ["1 x Unlimited 1 GB", "2 x Unlimited 2 GB", "2 x 1 GB Data-pack"]
+    context "different freebies" do
+      let(:pricing_rules) { [BuySomeGetSomeFreebieRule.new(1, product_medium, 1, product_datapack)] }
+
+      it "applies the additional freebies to the items" do
+        expect(shopping_cart.total).to eq "$84.70"
+        expect(shopping_cart.items).to eq ["1 x Unlimited 1 GB", "2 x Unlimited 2 GB", "2 x 1 GB Data-pack"]
+      end
+    end
+
+    context "same freebies" do
+      let(:pricing_rules) { [BuySomeGetSomeFreebieRule.new(1, product_medium, 1, product_medium)] }
+
+      it "applies the additional freebies to the items" do
+        expect(shopping_cart.total).to eq "$84.70"
+        expect(shopping_cart.items).to eq ["1 x Unlimited 1 GB", "4 x Unlimited 2 GB"]
+      end
+    end
+
+    context "different number of freebies" do
+      let(:pricing_rules) { [BuySomeGetSomeFreebieRule.new(2, product_medium, 1, product_datapack)] }
+
+      it "applies the additional freebies to the items" do
+        expect(shopping_cart.total).to eq "$84.70"
+        expect(shopping_cart.items).to eq ["1 x Unlimited 1 GB", "2 x Unlimited 2 GB", "1 x 1 GB Data-pack"]
+      end
     end
   end
 
