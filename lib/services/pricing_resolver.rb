@@ -1,8 +1,14 @@
 class PricingResolver
   def self.execute(pricing_rules, line_items, promo)
     total = 0
-    line_items.each do |item|
-      total += execute_rules(pricing_rules, item)
+    if pricing_rules.any?
+      line_items.each do |item|
+        total += execute_rules(pricing_rules, item)
+      end
+    else
+      line_items.each do |item|
+        total += item.total
+      end
     end
     return total
   end
