@@ -116,16 +116,15 @@ describe ShoppingCart do
     let(:line_item_1) { LineItem.new(product_small, 1) }
     let(:line_item_2) { LineItem.new(product_datapack, 1) }
 
+    let(:pricing_rules) { [TotalDiscountPromoRule.new("I<3AMAYSIM", 10)] }
+
     before do
       shopping_cart.add(line_item_1)
       shopping_cart.add(line_item_2, "I<3AMAYSIM")
-
-      allow(PricingResolver).to receive(:execute).with(pricing_rules, line_items, "I<3AMAYSIM").and_return(32.31)
-      allow(FreebieResolver).to receive(:execute).with(freebie_rules, line_items).and_return(line_items)
     end
 
     it "applies the discount to the item total" do
-      expect(shopping_cart.total).to eq "$32.31"
+      expect(shopping_cart.total).to eq "$31.32"
       expect(shopping_cart.items).to eq ["1 x Unlimited 1 GB", "1 x 1 GB Data-pack"]
     end
   end
