@@ -18,21 +18,24 @@ class ShoppingCart
     @pricing_rules, @freebie_rules  = parse_rules(pricing_rules)
     @line_items = []
     @promo = nil
+    @total = 0
+    @freebies = []
   end
 
   def add(item, *promo_code)
     @line_items << item
     @promo = promo_code[0] if promo_code.any?
+    @total += PricingResolver.execute(@pricing_rules, item)
+    @freebies += FreebieResolver.execute(@freebie_rules, item)
   end
 
   def total
-    total = PricingResolver.execute(@pricing_rules, @line_items, @promo)
-    "$#{'%.2f' % total}"
+    "$#{'%.2f' % @total}"
   end
 
   def items
     cart_items = []
-    @line_items = FreebieResolver.execute(@freebie_rules, @line_items)
+    @line_items = FreebieResolver.sanitize_line_items(@line_items, @freebies)
     @line_items.each do |item|
       cart_items << item.to_s
     end

@@ -1,16 +1,5 @@
 class FreebieResolver
-  def self.execute(freebie_rules, line_items)
-    freebies = []
-    line_items.each do |item|
-      freebies = execute_rules(freebie_rules, item)
-    end
-    line_items = sanitize_line_items(line_items, freebies)
-    return line_items
-  end
-
-  private
-
-  def self.execute_rules(freebie_rules, item)
+  def self.execute(freebie_rules, item)
     freebies = []
     freebie_rules.each do |rule|
       rule_freebies = rule.execute(item)
