@@ -14,13 +14,11 @@ describe ShoppingCart do
   context "3 for 2 promo" do
     let(:line_item_2) { LineItem.new(product_large, 1) }
 
-    let(:pricing_rules) { [MoreForLessPricingRule.new("ult_small", 3, 2)] }
+    let(:pricing_rules) { [MoreForLessPricingRule.new(product_small, 3, 2)] }
 
     before do
       shopping_cart.add(line_item_1)
       shopping_cart.add(line_item_2)
-
-      allow(FreebieResolver).to receive(:execute).with(freebie_rules, line_items).and_return(line_items)
     end
 
     context "exact 3 items" do
