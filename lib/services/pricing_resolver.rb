@@ -4,15 +4,10 @@ class PricingResolver
     if pricing_rules.any?
       pricing_rules.each do |rule|
         rule_price = rule.execute(item)
-        if rule_price
-          line_item_total += rule_price
-        else
-          line_item_total += item.total
-        end
+        line_item_total += rule_price if rule_price
       end
-    else
-      line_item_total = item.total
     end
+    line_item_total = item.total if line_item_total == 0
 
     return line_item_total
   end

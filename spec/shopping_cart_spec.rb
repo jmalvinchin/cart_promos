@@ -114,16 +114,67 @@ describe ShoppingCart do
     let(:line_item_1) { LineItem.new(product_small, 1) }
     let(:line_item_2) { LineItem.new(product_datapack, 1) }
 
-    let(:pricing_rules) { [TotalDiscountPromoRule.new("I<3AMAYSIM", 10)] }
-
     before do
       shopping_cart.add(line_item_1)
       shopping_cart.add(line_item_2, "I<3AMAYSIM")
     end
 
-    it "applies the discount to the item total" do
-      expect(shopping_cart.total).to eq "$31.32"
-      expect(shopping_cart.items).to eq ["1 x Unlimited 1 GB", "1 x 1 GB Data-pack"]
+    context "1 discount promo" do
+      let(:pricing_rules) { [TotalDiscountPromoRule.new("I<3AMAYSIM", 10)] }
+
+      it "applies the discount to the item total" do
+        expect(shopping_cart.total).to eq "$31.32"
+        expect(shopping_cart.items).to eq ["1 x Unlimited 1 GB", "1 x 1 GB Data-pack"]
+      end
+    end
+
+    context "no discount promo" do
+      let(:pricing_rules) { [] }
+
+      it "applies the discount to the item total" do
+        expect(shopping_cart.total).to eq "$34.80"
+        expect(shopping_cart.items).to eq ["1 x Unlimited 1 GB", "1 x 1 GB Data-pack"]
+      end
+    end
+
+    context "no discount promo" do
+      let(:line_item_3) { LineItem.new(product_medium, 1) }
+      let(:pricing_rules) { [TotalDiscountPromoRule.new("I<3AMAYSIM", 10), TotalDiscountPromoRule.new("IRLY<3AMAYSIM", 5)] }
+
+      before do
+        shopping_cart.add(line_item_3, "IRLY<3AMAYSIM")
+      end
+
+      it "applies the discount to the item total" do
+        expect(shopping_cart.total).to eq "$55.32"
+        expect(shopping_cart.items).to eq ["1 x Unlimited 1 GB", "1 x 1 GB Data-pack", "1 x Unlimited 2 GB"]
+      end
+    end
+  end
+
+  context "combined promos" do
+    let(:line_item_1) { LineItem.new(product_small, 3) }
+    let(:line_item_2) { LineItem.new(product_large, 3) }
+    let(:line_item_3) { LineItem.new(product_medium, 1) }
+
+    let(:pricing_rules) do
+      [
+        MoreForLessPricingRule.new(product_small, 3, 2),
+        BulkDiscountPricingRule.new(product_large, 3, 39.9),
+        BuySomeGetSomeFreebieRule.new(1, product_medium, 1, product_datapack),
+        TotalDiscountPromoRule.new("I<3AMAYSIM", 10)
+      ]
+    end
+
+    before do
+      shopping_cart.add(line_item_1)
+      shopping_cart.add(line_item_2)
+      shopping_cart.add(line_item_3, "I<3AMAYSIM")
+    end
+
+    it "applies the correct pricing, freebies and discounts" do
+      expect(shopping_cart.total).to eq "$179.46"
+      expect(shopping_cart.items).to eq ["3 x Unlimited 1 GB", "3 x Unlimited 5 GB", "1 x Unlimited 2 GB", "1 x 1 GB Data-pack"]
     end
   end
 end
