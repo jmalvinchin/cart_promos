@@ -1,8 +1,4 @@
 class BulkDiscountPricingRule < Rule
-  attr_accessor :product
-  attr_accessor :bulk_count_threshold
-  attr_accessor :bulk_discount
-
   def initialize(product, threshold, price)
     @product = product
     @bulk_count_threshold = threshold
